@@ -3,8 +3,10 @@ package com.alpha.books_explorer.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.alpha.books_explorer.data.local.FavBookDatabase
 import com.alpha.books_explorer.data.local.dao.FavBookDao
 import com.alpha.books_explorer.data.local.dao.ReadingListDao
+import com.alpha.books_explorer.data.local.entities.NoteEntity
 import com.alpha.books_explorer.data.mappers.toBook
 import com.alpha.books_explorer.data.mappers.toBookEntity
 import com.alpha.books_explorer.data.mappers.toReadingListEntity
@@ -12,36 +14,59 @@ import com.alpha.books_explorer.data.paging.BooksPagingSource
 import com.alpha.books_explorer.data.remote.BookApiService
 import com.alpha.books_explorer.domain.model.Book
 import com.alpha.books_explorer.domain.repository.BookRepository
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 
-class BookRepositoryImpl
-@Inject constructor(
+class BookRepositoryImpl(
     private val api: BookApiService,
     private val localDao: FavBookDao,
     private val readingListDao: ReadingListDao,
+    private val database: FavBookDatabase
 ) : BookRepository {
+    
+    private val noteDao = database.getNoteDao()
+
     override fun getBooks(query: String): Flow<List<Book>> = flow {
         val response = api.searchBooks(query, 0, 10)
         val books = response.items ?: emptyList()
         emit(books)
     }
 
-    override fun getBooksFromPaging(query: String): Flow<PagingData<Book>> {
+    override fun getBooksFromPaging(
+        query: String,
+        filter: String?,
+        orderBy: String?,
+        printType: String?
+    ): Flow<PagingData<Book>> {
         return Pager(
             config = PagingConfig(
                 initialLoadSize = 20,
                 pageSize = 20,
                 enablePlaceholders = false,
             ),
-            pagingSourceFactory = { BooksPagingSource(api, query) },
+            pagingSourceFactory = { 
+                BooksPagingSource(
+                    api = api, 
+                    query = query,
+                    filter = filter,
+                    orderBy = orderBy,
+                    printType = printType
+                ) 
+            },
         ).flow
     }
 
     override fun getBookById(id: String): Flow<Book> = flow {
         val response = api.getBookById(id)
         emit(response)
+    }
+
+    override fun getBookFromReadingList(id: String): Flow<Book> = flow {
+        val entity = readingListDao.getBookById(id)
+        if (entity != null) {
+            emit(entity.toBook())
+        }
     }
 
     override suspend fun addIntoFavListBooks(book: Book) {
@@ -96,5 +121,31 @@ class BookRepositoryImpl
                 it.toBook()
             },
         )
+    }
+    
+    override fun getNotesForBook(bookId: String): Flow<List<NoteEntity>> {
+        return noteDao.getNotesForBook(bookId)
+    }
+    
+    override suspend fun addNote(note: NoteEntity) {
+        noteDao.insertNote(note)
+    }
+    
+    override suspend fun deleteNote(note: NoteEntity) {
+        noteDao.deleteNote(note)
+    }
+    
+    override fun getReadingStats(): Flow<Map<String, Int>> {
+        val toRead = readingListDao.getCountByStatus("To Read")
+        val reading = readingListDao.getCountByStatus("Reading")
+        val finished = readingListDao.getCountByStatus("Finished")
+        
+        return combine(toRead, reading, finished) { t, r, f ->
+            mapOf(
+                "To Read" to t,
+                "Reading" to r,
+                "Finished" to f
+            )
+        }
     }
 }

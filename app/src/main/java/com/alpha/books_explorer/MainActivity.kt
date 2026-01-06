@@ -1,26 +1,31 @@
 package com.alpha.books_explorer
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Scaffold
-import androidx.compose.ui.Modifier
-import com.alpha.books_explorer.presentation.navigation.MyAppNavHost
-import com.alpha.books_explorer.presentation.ui.theme.BookExplorerTheme
-import dagger.hilt.android.AndroidEntryPoint
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
+import com.alpha.books_explorer.databinding.ActivityMainBinding
 
-@AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            BookExplorerTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MyAppNavHost(innerPadding)
-                }
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        // Setup Navigation
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as? NavHostFragment
+        val navController = navHostFragment?.navController
+
+        if (navController != null) {
+            binding.bottomNavView.setupWithNavController(navController)
+            
+            // Handle reselection to pop back stack (e.g. from Detail -> Search/List)
+            binding.bottomNavView.setOnItemReselectedListener { item ->
+                navController.popBackStack(item.itemId, false)
             }
         }
     }

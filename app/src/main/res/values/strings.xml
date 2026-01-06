@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">Book-Explorer</string>
+    <string name="app_name">Books Explorer</string>
+    <string-array name="reading_status_options">
+        <item>To Read</item>
+        <item>Reading</item>
+        <item>Finished</item>
+    </string-array>
 </resources>

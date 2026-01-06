@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Filters"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Book Type"
+        android:textStyle="bold" />
+
+    <RadioGroup
+        android:id="@+id/filterGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/filterAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All" 
+            android:checked="true"/>
+
+        <RadioButton
+            android:id="@+id/filterFree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Free eBooks" />
+            
+        <RadioButton
+            android:id="@+id/filterPaid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Paid eBooks" />
+    </RadioGroup>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sort By"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"/>
+
+    <RadioGroup
+        android:id="@+id/sortGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/sortRelevance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Relevance" 
+            android:checked="true"/>
+
+        <RadioButton
+            android:id="@+id/sortNewest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Newest" />
+    </RadioGroup>
+    
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Print Type"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"/>
+
+    <RadioGroup
+        android:id="@+id/printTypeGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/printAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All" 
+            android:checked="true"/>
+
+        <RadioButton
+            android:id="@+id/printBooks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Books" />
+            
+        <RadioButton
+            android:id="@+id/printMagazines"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Magazines" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/applyFiltersButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Apply Filters"
+        android:layout_marginTop="24dp"/>
+
+</LinearLayout>

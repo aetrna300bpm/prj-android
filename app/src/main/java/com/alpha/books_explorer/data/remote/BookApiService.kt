@@ -9,12 +9,12 @@ import retrofit2.http.Query
 interface BookApiService {
     @GET("volumes")
     suspend fun searchBooks(
-        @Query("q")
-        query: String,
-        @Query("startIndex")
-        startIndex: Int,
-        @Query("maxResults")
-        maxResults: Int,
+        @Query("q") query: String,
+        @Query("startIndex") startIndex: Int,
+        @Query("maxResults") maxResults: Int,
+        @Query("filter") filter: String? = null, // partial, full, free-ebooks, paid-ebooks, ebooks
+        @Query("orderBy") orderBy: String? = null, // relevance, newest
+        @Query("printType") printType: String? = null // all, books, magazines
     ): BookSearchResponse
 
     @GET("volumes/{bookId}")

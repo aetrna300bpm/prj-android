@@ -2,48 +2,45 @@ package com.alpha.books_explorer.presentation.ui.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.alpha.books_explorer.domain.usecase.GetBooksUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.launch
 
-@HiltViewModel
-open class SearchViewModel
-@Inject
-constructor(
+class SearchViewModel(
     private val getBooksUseCase: GetBooksUseCase,
 ) : ViewModel() {
-    private val _searchText = MutableSharedFlow<String>()
-    val searchText: SharedFlow<String> = _searchText
 
     private val _searchBookList = MutableStateFlow(SearchUiState())
     val searchBookList: StateFlow<SearchUiState> = _searchBookList
+    
+    private var lastQuery: String = "Android"
+    
+    // Default filters
+    var currentFilter: String? = null
+    var currentOrderBy: String? = "relevance"
+    var currentPrintType: String? = "all"
 
     init {
-        resetScreen()
-        viewModelScope.launch {
-            _searchText.debounce { 300 }.collect {
-                if (it.isNotEmpty()) {
-                    _searchBookList.value = SearchUiState(isLoading = true)
-                    val result = getBooksUseCase.invokePaging(it)
-                    _searchBookList.value = SearchUiState(books = result)
-                }
-            }
-        }
+        loadBooks(lastQuery)
     }
 
-    fun resetScreen() {
-        _searchBookList.value = SearchUiState()
+    fun loadBooks(query: String) {
+        lastQuery = query
+        val pagingFlow = getBooksUseCase.invokePaging(
+            query,
+            filter = currentFilter,
+            orderBy = currentOrderBy,
+            printType = currentPrintType
+        ).cachedIn(viewModelScope)
+        
+        _searchBookList.value = SearchUiState(books = pagingFlow)
     }
-
-    fun updateSearchText(text: String) {
-        viewModelScope.launch {
-            _searchText.emit(text)
-        }
+    
+    fun updateFilters(filter: String?, orderBy: String?, printType: String?) {
+        currentFilter = filter
+        currentOrderBy = orderBy
+        currentPrintType = printType
+        loadBooks(lastQuery)
     }
 }

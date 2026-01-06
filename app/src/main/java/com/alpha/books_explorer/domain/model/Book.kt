@@ -3,6 +3,10 @@ package com.alpha.books_explorer.domain.model
 data class Book(
     val id: String,
     val volumeInfo: VolumeInfo,
+    // User specific fields (from local DB)
+    val readingStatus: String? = null, // "To Read", "Reading", "Finished"
+    val rating: Float? = null,
+    val notes: String? = null
 )
 
 data class VolumeInfo(
@@ -13,6 +17,7 @@ data class VolumeInfo(
     val publishedDate: String?,
     val description: String?,
     val imageLinks: ImageLinks?,
+    val previewLink: String?
 )
 
 data class ImageLinks(

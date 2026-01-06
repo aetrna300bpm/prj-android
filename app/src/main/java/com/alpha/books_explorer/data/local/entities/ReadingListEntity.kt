@@ -14,4 +14,9 @@ data class ReadingListEntity(
     val publishedDate: String?,
     val description: String?,
     val thumbnail: String?,
+    // New fields
+    val readingStatus: String? = "To Read",
+    val rating: Float? = 0f,
+    val notes: String? = null,
+    val previewLink: String? = null
 )
