@@ -44,4 +44,9 @@ interface BookRepository {
     
     // Stats
     fun getReadingStats(): Flow<Map<String, Int>>
+    
+    // User Profile
+    fun getUserName(): Flow<String>
+    
+    suspend fun saveUserName(firstName: String, lastName: String)
 }

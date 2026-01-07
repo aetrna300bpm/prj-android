@@ -1,5 +1,7 @@
 package com.alpha.books_explorer.data.repository
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -14,7 +16,9 @@ import com.alpha.books_explorer.data.paging.BooksPagingSource
 import com.alpha.books_explorer.data.remote.BookApiService
 import com.alpha.books_explorer.domain.model.Book
 import com.alpha.books_explorer.domain.repository.BookRepository
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 
@@ -22,10 +26,12 @@ class BookRepositoryImpl(
     private val api: BookApiService,
     private val localDao: FavBookDao,
     private val readingListDao: ReadingListDao,
-    private val database: FavBookDatabase
+    private val database: FavBookDatabase,
+    private val context: Context // Pass context for SharedPreferences
 ) : BookRepository {
     
     private val noteDao = database.getNoteDao()
+    private val sharedPreferences: SharedPreferences = context.getSharedPreferences("user_profile", Context.MODE_PRIVATE)
 
     override fun getBooks(query: String): Flow<List<Book>> = flow {
         val response = api.searchBooks(query, 0, 10)
@@ -146,6 +152,34 @@ class BookRepositoryImpl(
                 "Reading" to r,
                 "Finished" to f
             )
+        }
+    }
+    
+    override fun getUserName(): Flow<String> = callbackFlow {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+            if (key == "first_name" || key == "last_name") {
+                val firstName = sharedPreferences.getString("first_name", "John") ?: "John"
+                val lastName = sharedPreferences.getString("last_name", "Doe") ?: "Doe"
+                trySend("$firstName $lastName")
+            }
+        }
+        sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
+        
+        // Initial emission
+        val firstName = sharedPreferences.getString("first_name", "John") ?: "John"
+        val lastName = sharedPreferences.getString("last_name", "Doe") ?: "Doe"
+        trySend("$firstName $lastName")
+        
+        awaitClose {
+            sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener)
+        }
+    }
+    
+    override suspend fun saveUserName(firstName: String, lastName: String) {
+        sharedPreferences.edit().apply {
+            putString("first_name", firstName)
+            putString("last_name", lastName)
+            apply()
         }
     }
 }

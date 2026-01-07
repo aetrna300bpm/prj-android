@@ -2,20 +2,28 @@ package com.alpha.books_explorer.presentation.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.alpha.books_explorer.domain.model.ThemeMode
 import com.alpha.books_explorer.domain.repository.BookRepository
+import com.alpha.books_explorer.domain.repository.SettingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class ProfileViewModel(
-    private val bookRepository: BookRepository
+    private val bookRepository: BookRepository,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
-    private val _userProfile = MutableStateFlow(UserProfile())
-    val userProfile: StateFlow<UserProfile> = _userProfile
+    
+    val userName: StateFlow<String> = bookRepository.getUserName()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = "John Doe"
+        )
 
-    // Analysis: Count books in reading list
     val readingListCount: StateFlow<Int> = bookRepository.getReadingListBooks()
         .map { it.size }
         .stateIn(
@@ -30,28 +38,23 @@ class ProfileViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyMap()
         )
+        
+    val themeMode: StateFlow<ThemeMode> = settingsRepository.getThemeMode()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = ThemeMode.SYSTEM
+        )
 
-    fun loadUserProfile() {
-        // In a real app, fetch from DataStore/API.
-        // For now, we use the default values in UserProfile or keep current state.
-    }
-
-    fun updateFirstName(name: String) {
-        _userProfile.value = _userProfile.value.copy(firstName = name)
-    }
-
-    fun updateLastName(name: String) {
-        _userProfile.value = _userProfile.value.copy(lastName = name)
+    fun updateName(firstName: String, lastName: String) {
+        viewModelScope.launch {
+            bookRepository.saveUserName(firstName, lastName)
+        }
     }
     
-    fun logout() {
-        // Reset to default or clear data
-        _userProfile.value = UserProfile(firstName = "", lastName = "", email = "")
+    fun setThemeMode(mode: ThemeMode) {
+        viewModelScope.launch {
+            settingsRepository.setThemeMode(mode)
+        }
     }
 }
-
-data class UserProfile(
-    val firstName: String = "John",
-    val lastName: String = "Doe",
-    val email: String = "john.doe@example.com",
-)

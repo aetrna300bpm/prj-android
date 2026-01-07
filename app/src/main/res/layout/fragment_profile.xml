@@ -21,14 +21,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="User Name"
+        android:text="John Doe"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/profileImage" />
+        
+    <ImageButton
+        android:id="@+id/editNameButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_menu_edit"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="?attr/colorControlNormal"
+        app:layout_constraintStart_toEndOf="@id/userName"
+        app:layout_constraintTop_toTopOf="@id/userName"
+        app:layout_constraintBottom_toBottomOf="@id/userName"
+        android:layout_marginStart="8dp" />
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/statsCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
@@ -134,6 +147,73 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+    
+    <!-- Settings Section -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:layout_constraintTop_toBottomOf="@id/statsCard">
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Settings"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+                
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Theme"
+                android:textStyle="bold" />
+                
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/themeToggleGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:singleSelection="true"
+                app:selectionRequired="true">
+                
+                <Button
+                    android:id="@+id/themeLight"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:text="Light" />
+                    
+                <Button
+                    android:id="@+id/themeDark"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:text="Dark" />
+                    
+                <Button
+                    android:id="@+id/themeSystem"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:text="System" />
+                    
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+            
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
